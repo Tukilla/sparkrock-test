@@ -2,19 +2,34 @@ version: "3.9"
 
 services:
   api:
-    build: ./app/api
-    container_name: api
-    ports:
-      - "3000:3000"
+    image: tukilla/node-api:latest
+    restart: always
+    expose:
+      - "3000"
 
   web:
-    build: ./app/web
-    container_name: web
+    image: tukilla/web-frontend:latest
+    restart: always
     ports:
       - "80:80"
+      - "443:443"
     environment:
       BASIC_AUTH_USER: user
       BASIC_AUTH_PASS: admin123
     depends_on:
       - api
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /usr/share/nginx/html/.well-known:/usr/share/nginx/html/.well-known
 
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /usr/share/nginx/html/.well-known:/usr/share/nginx/html/.well-known
+    entrypoint: >
+      sh -c 'trap exit TERM;
+             while :; do
+               certbot renew --webroot -w /usr/share/nginx/html;
+               sleep 12h;
+             done'
