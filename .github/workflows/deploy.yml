@@ -1,0 +1,38 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build & push API
+        run: |
+          docker build -t tukilla/node-api:latest ./app/api
+          docker push tukilla/node-api:latest
+
+      - name: Build & push Web
+        run: |
+          docker build -t tukilla/web-frontend:latest ./app/web
+          docker push tukilla/web-frontend:latest
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: 13.62.125.181
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/sparkrock-test
+            git pull
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+
