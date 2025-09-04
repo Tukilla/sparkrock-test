@@ -40,7 +40,7 @@ All resources are deployed in a staging/test environment, clearly tagged with En
 ## Setup Instructions
 
 Local Run:
-```plaintext
+```bash
 1. Clone repo
 2. docker compose up -d
 ```
@@ -48,7 +48,7 @@ AWS Deployment:
 1. Provision infrastructure using infrastructure/template.yaml
 2. Copy docker-compose.yml and .env to EC2 instance
 3. Run:
-   ```plaintext
+   ```bash
    docker compose pull
    docker compose up -d
    ```
@@ -56,7 +56,7 @@ Authentication:
 Authentication is externalized via .env (not committed to git).
 
 Example .env:
-```plaintext
+```bash
 BASIC_AUTH_USER=changeme
 BASIC_AUTH_PASS=changeme
 ```
@@ -76,7 +76,7 @@ Steps:
    - tukilla/web-frontend:latest
 3. Push – Images are pushed to Docker Hub
 4. Deploy – GitHub Action connects to EC2 instance via SSH and runs:
-   ```plaintext
+   ```bash
    docker compose pull
    docker compose up -d
    ```
@@ -97,7 +97,7 @@ Before running the pipeline, configure the following repository secrets in GitHu
 When deploying with Let’s Encrypt for the first time, Nginx cannot start with SSL immediately because certificates don’t exist yet. Follow these steps:
 
 1. Deploy nginx with HTTP only
-   ```plaintext
+   ```bash
    server {
     listen 80;
     server_name sparkrock-test.30hills.com;
@@ -114,7 +114,7 @@ When deploying with Let’s Encrypt for the first time, Nginx cannot start with 
    }
    ```
 2. Request the first certificate
-   ```plaintext
+   ```bash
    docker run --rm \
      -v /etc/letsencrypt:/etc/letsencrypt \
      -v /usr/share/nginx/html:/usr/share/nginx/html \
@@ -124,12 +124,12 @@ When deploying with Let’s Encrypt for the first time, Nginx cannot start with 
      --email your@email.com --agree-tos --no-eff-email
    ```
    Certificates will be created under:
-   ```plaintext
+   ```bash
    /etc/letsencrypt/live/sparkrock-test.30hills.com/
    ```
-3. Switch to HTTPS example is in app/web/nginx.conf
+3. An example HTTPS server configuration can be found in [app/web/nginx.conf](app/web/nginx.conf)
 4. Enable auto renew in docker-compose.yml
-   ```plaintext
+   ```bash
    certbot:
      image: certbot/certbot
      volumes:
@@ -148,17 +148,17 @@ When deploying with Let’s Encrypt for the first time, Nginx cannot start with 
 Log Shipping to S3:
 - Nginx access and error logs are written in JSON format (~/logs)
 - Cron job executes sync-logs.sh every 5 minutes:
-  ```plaintext
+  ```bash
   */5 * * * * /home/<user>/sync-logs.sh >> /home/<user>/sync-logs.log 2>&1
   ```
 - Logs are synced to S3 bucket:
-- ```plaintext
+- ```bash
   s3://sparkrock-logs-<account>-eu-north-1/nginx/
   ```
 - Verified by accessing S3 and checking uploaded access.log and error.log
   
 - NOTE: On first deployment, create the log directory on the server:
-  ```plaintext
+  ```bash
   mkdir -p ~/logs
   ```
   This ensures Nginx can mount logs correctly for shipping to S3
