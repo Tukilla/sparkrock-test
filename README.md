@@ -92,6 +92,55 @@ Before running the pipeline, configure the following repository secrets in GitHu
 
 ---
 
+## SSL Setup with Nginx + Certbot
+
+1. Deploy nginx with HTTP only
+   ```plaintext
+   server {
+    listen 80;
+    server_name sparkrock-test.30hills.com;
+
+    location /.well-known/acme-challenge/ {
+        root /usr/share/nginx/html;
+        auth_basic off;
+    }
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+   }
+   ```
+2. Request the first certificate
+   ```plaintext
+   docker run --rm \
+     -v /etc/letsencrypt:/etc/letsencrypt \
+     -v /usr/share/nginx/html:/usr/share/nginx/html \
+     certbot/certbot certonly \
+     --webroot -w /usr/share/nginx/html \
+     -d sparkrock-test.30hills.com \
+     --email your@email.com --agree-tos --no-eff-email
+   ```
+   Certificates will be created under:
+   ```plaintext
+   /etc/letsencrypt/live/sparkrock-test.30hills.com/
+   ```
+3. Switch to HTTPS example is in app/web/nginx.conf
+4. Enable auto renew in docker-compose.yml
+   ```plaintext
+   certbot:
+     image: certbot/certbot
+     volumes:
+       - /etc/letsencrypt:/etc/letsencrypt
+       - /usr/share/nginx/html/.well-known:/usr/share/nginx/html/.well-known
+     entrypoint: >
+       sh -c 'trap exit TERM;
+              while :; do
+                certbot renew --webroot -w /usr/share/nginx/html;
+                sleep 12h;
+              done'
+   ```
+
 ## Logging and Monitoring
 
 Log Shipping to S3:
