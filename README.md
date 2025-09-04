@@ -92,7 +92,7 @@ Log Shipping to S3:
 - Nginx access and error logs are written in JSON format (~/logs)
 - Cron job executes sync-logs.sh every 5 minutes:
   ```plaintext
-  */5 * * * * /home/ec2-user/sync-logs.sh >> /home/ec2-user/sync-logs.log 2>&1
+  */5 * * * * /home/<user>/sync-logs.sh >> /home/<user>/sync-logs.log 2>&1
   ```
 - Logs are synced to S3 bucket:
 - ```plaintext
