@@ -94,6 +94,8 @@ Before running the pipeline, configure the following repository secrets in GitHu
 
 ## SSL Setup with Nginx + Certbot
 
+When deploying with Let’s Encrypt for the first time, Nginx cannot start with SSL immediately because certificates don’t exist yet. Follow these steps:
+
 1. Deploy nginx with HTTP only
    ```plaintext
    server {
