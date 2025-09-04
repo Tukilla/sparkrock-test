@@ -14,11 +14,12 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      BASIC_AUTH_USER: user
-      BASIC_AUTH_PASS: admin123
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER}
+      BASIC_AUTH_PASS: ${BASIC_AUTH_PASS}
     depends_on:
       - api
     volumes:
+      - ./logs:/var/log/nginx
       - /etc/letsencrypt:/etc/letsencrypt
       - /usr/share/nginx/html/.well-known:/usr/share/nginx/html/.well-known
 
