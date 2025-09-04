@@ -9,6 +9,7 @@ All resources are deployed in a staging/test environment, clearly tagged with En
 ---
 
 ## Repository Structure
+```plaintext
 .
 ├── app
 │   ├── api                 # Node.js API service
@@ -21,7 +22,7 @@ All resources are deployed in a staging/test environment, clearly tagged with En
 ├── README.md
 ├── sample.env              # Example environment variables
 └── sync-logs.sh            # Script for syncing logs to S3
-
+```
 ---
 
 ## Architecture
@@ -39,23 +40,26 @@ All resources are deployed in a staging/test environment, clearly tagged with En
 ## Setup Instructions
 
 Local Run:
+```plaintext
 1. Clone repo
 2. docker compose up -d
-
+```
 AWS Deployment:
 1. Provision infrastructure using infrastructure/template.yaml
 2. Copy docker-compose.yml and .env to EC2 instance
 3. Run:
+   ```plaintext
    docker compose pull
    docker compose up -d
-
+   ```
 Authentication:
 Authentication is externalized via .env (not committed to git).
 
 Example .env:
+```plaintext
 BASIC_AUTH_USER=changeme
 BASIC_AUTH_PASS=changeme
-
+```
 For reference, see sample.env.
 
 On container startup, .htpasswd is automatically generated from these values.
@@ -72,9 +76,10 @@ Steps:
    - tukilla/web-frontend:latest
 3. Push – Images are pushed to Docker Hub
 4. Deploy – GitHub Action connects to EC2 instance via SSH and runs:
+   ```plaintext
    docker compose pull
    docker compose up -d
-
+   ```
 DNS Note:
 Staging environment is exposed publicly via DigitalOcean DNS (sparkrock-test.30hills.com) pointing to AWS Elastic IP.
 Certificates are managed with Certbot + Let’s Encrypt.
@@ -86,9 +91,13 @@ Certificates are managed with Certbot + Let’s Encrypt.
 Log Shipping to S3:
 - Nginx access and error logs are written in JSON format (~/logs)
 - Cron job executes sync-logs.sh every 5 minutes:
+  ```plaintext
   */5 * * * * /home/ec2-user/sync-logs.sh >> /home/ec2-user/sync-logs.log 2>&1
+  ```
 - Logs are synced to S3 bucket:
+- ```plaintext
   s3://sparkrock-logs-<account>-eu-north-1/nginx/
+  ```
 - Verified by accessing S3 and checking uploaded access.log and error.log
 
 CloudWatch Alarm:
@@ -111,14 +120,15 @@ CloudWatch Alarm:
 ---
 
 ## Endpoints
-Web: https://sparkrock-test.30hills.com/
-API Health: https://sparkrock-test.30hills.com/api/health
-API Hello: https://sparkrock-test.30hills.com/api/hello
+- **Web:** [https://sparkrock-test.30hills.com/](https://sparkrock-test.30hills.com/)
+- **API Health:** [https://sparkrock-test.30hills.com/api/health](https://sparkrock-test.30hills.com/api/health)
+- **API Hello:** [https://sparkrock-test.30hills.com/api/hello](https://sparkrock-test.30hills.com/api/hello)
 
 Test credentials (staging only):
+```plaintext
 Username: user
 Password: admin123
-
+```
 ---
 
 ## Notes
