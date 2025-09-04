@@ -99,7 +99,13 @@ Log Shipping to S3:
   s3://sparkrock-logs-<account>-eu-north-1/nginx/
   ```
 - Verified by accessing S3 and checking uploaded access.log and error.log
-
+  
+- NOTE: On first deployment, create the log directory on the server:
+  ```plaintext
+  mkdir -p ~/logs
+  ```
+  This ensures Nginx can mount logs correctly for shipping to S3
+  
 CloudWatch Alarm:
 - Alarm name: Sparkrock-Staging-CPUAlarm
 - Condition: CPUUtilization > 70% for 1 minute
