@@ -80,9 +80,15 @@ Steps:
    docker compose pull
    docker compose up -d
    ```
-DNS Note:
-Staging environment is exposed publicly via DigitalOcean DNS (sparkrock-test.30hills.com) pointing to AWS Elastic IP.
-Certificates are managed with Certbot + Let’s Encrypt.
+## Required GitHub Secrets
+Before running the pipeline, configure the following repository secrets in GitHub:
+
+- `DOCKERHUB_USER` – Docker Hub username
+- `DOCKERHUB_PASSWORD` – Docker Hub password or access token
+- `EC2_SSH_KEY` – Private SSH key used for connecting to the target server
+
+> **Note:** These values must be configured in **Repository Settings → Secrets and Variables → Actions**.  
+> Without these secrets, the GitHub Actions workflow will fail.
 
 ---
 
@@ -135,6 +141,10 @@ Test credentials (staging only):
 Username: user
 Password: admin123
 ```
+DNS Note:
+Staging environment is exposed publicly via DigitalOcean DNS (sparkrock-test.30hills.com) pointing to AWS Elastic IP.
+Certificates are managed with Certbot + Let’s Encrypt.
+
 ---
 
 ## Notes
